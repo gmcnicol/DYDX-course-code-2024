@@ -1,17 +1,21 @@
 import asyncio
 import time
+from pprint import pprint
+
 from constants import ABORT_ALL_POSITIONS, FIND_COINTEGRATED, PLACE_TRADES, MANAGE_EXITS
-from func_connections import connect_dydx
-from func_private import abort_all_positions, place_market_order, get_open_positions
-from func_public import construct_market_prices
 from func_cointegration import store_cointegration_results
+from func_connections import connect_exchange
 from func_entry_pairs import open_positions
 from func_exit_pairs import manage_trade_exits
 from func_messaging import send_message
+from func_private import abort_all_positions
+from func_public import construct_market_prices, ISO_TIMES
+
 
 # MAIN FUNCTION
 async def main():
-
+  pprint(ISO_TIMES)
+  exit(0)
   # Message on start
   send_message("Bot launch successful")
 
@@ -20,7 +24,7 @@ async def main():
     print("")
     print("Program started...")
     print("Connecting to Client...")
-    client = await connect_dydx()
+    client = await connect_exchange()
   except Exception as e:
     print("Error connecting to client: ", e)
     send_message(f"Failed to connect to client {e}")

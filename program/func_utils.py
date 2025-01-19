@@ -27,7 +27,7 @@ def format_time(timestamp):
 
 
 # Get ISO Times
-def get_ISO_times():
+def get_iso_times():
 
   # Get timestamps
   date_start_0 = datetime.now()

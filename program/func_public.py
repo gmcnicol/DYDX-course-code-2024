@@ -1,5 +1,5 @@
 from constants import RESOLUTION
-from func_utils import get_ISO_times
+from func_utils import get_iso_times
 import pandas as pd
 import numpy as np
 import time
@@ -7,7 +7,7 @@ import time
 from pprint import pprint
 
 # Get relevant time periods for ISO from and to
-ISO_TIMES = get_ISO_times()
+ISO_TIMES = get_iso_times()
 
 # Get Recent Candles
 async def get_candles_recent(client, market):
