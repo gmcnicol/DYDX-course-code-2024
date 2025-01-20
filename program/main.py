@@ -4,18 +4,16 @@ from pprint import pprint
 
 from constants import ABORT_ALL_POSITIONS, FIND_COINTEGRATED, PLACE_TRADES, MANAGE_EXITS
 from func_cointegration import store_cointegration_results
-from func_connections import connect_exchange
+from func_connections import connect_exchange, close_client
 from func_entry_pairs import open_positions
 from func_exit_pairs import manage_trade_exits
 from func_messaging import send_message
 from func_private import abort_all_positions
-from func_public import construct_market_prices, ISO_TIMES
+from func_public import construct_market_prices, ISO_TIMES, get_markets
 
 
 # MAIN FUNCTION
 async def main():
-  pprint(ISO_TIMES)
-  exit(0)
   # Message on start
   send_message("Bot launch successful")
 
@@ -25,9 +23,11 @@ async def main():
     print("Program started...")
     print("Connecting to Client...")
     client = await connect_exchange()
+
   except Exception as e:
     print("Error connecting to client: ", e)
     send_message(f"Failed to connect to client {e}")
+    await close_client(client)
     exit(1)
 
   # Abort all open positions
@@ -55,7 +55,7 @@ async def main():
       send_message(f"Error constructing market prices {e}")
       exit(1)
 
-    # Store Cointegrated Pairs
+    # Store Co-integrated Pairs
     try:
       print("")
       print("Storing cointegrated pairs...")
@@ -67,7 +67,8 @@ async def main():
       print("Error saving cointegrated pairs: ", e)
       send_message(f"Error saving cointegrated pairs {e}")
       exit(1)
-
+  await close_client(client)
+  exit(0)
   # Run as always on
   while True:
 

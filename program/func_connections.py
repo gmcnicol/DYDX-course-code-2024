@@ -1,4 +1,4 @@
-import ccxt
+import ccxt.async_support as ccxt
 
 from constants import EXCHANGE, API_KEY, API_SECRET
 
@@ -21,3 +21,7 @@ async def connect_exchange():
   })
   # Determine market data endpoint
   return ccxt_client
+
+async def close_client(client):
+  await client.close()
+  return

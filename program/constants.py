@@ -10,7 +10,7 @@ API_SECRET = config(f"{EXCHANGE.upper()}_API_SECRET")
 ABORT_ALL_POSITIONS = False
 
 # Find Cointegrated Pairs
-FIND_COINTEGRATED = False
+FIND_COINTEGRATED = True
 
 # Manage Exits
 MANAGE_EXITS = False

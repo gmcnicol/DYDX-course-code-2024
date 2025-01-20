@@ -23,7 +23,8 @@ def format_number(curr_num, match_num):
 
 # Format time
 def format_time(timestamp):
-  return timestamp.replace(microsecond=0).isoformat()
+
+  return timestamp.replace(microsecond=0)
 
 
 # Get ISO Times
