@@ -20,6 +20,7 @@ async def connect_exchange():
     'secret': API_SECRET,
   })
   # Determine market data endpoint
+  ccxt_client.options["warnOnFetchOpenOrdersWithoutSymbol"] = False
   return ccxt_client
 
 async def close_client(client):

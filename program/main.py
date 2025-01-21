@@ -8,7 +8,7 @@ from func_connections import connect_exchange, close_client
 from func_entry_pairs import open_positions
 from func_exit_pairs import manage_trade_exits
 from func_messaging import send_message
-from func_private import abort_all_positions
+from func_private import abort_all_positions, get_balances
 from func_public import construct_market_prices, ISO_TIMES, get_markets
 
 
@@ -29,7 +29,7 @@ async def main():
     send_message(f"Failed to connect to client {e}")
     await close_client(client)
     exit(1)
-
+  balances = await get_balances(client)
   # Abort all open positions
   if ABORT_ALL_POSITIONS:
     try:
