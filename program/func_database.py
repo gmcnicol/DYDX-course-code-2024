@@ -138,7 +138,7 @@ def store_cointegrated_markets(pairs):
         if conn:
             conn.close()
 
-def get_cointegrated_markets()
+def get_cointegrated_markets():
     conn, cursor = None, None
     try:
         conn, cursor = _connect_to_database()
