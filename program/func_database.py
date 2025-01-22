@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime, timezone
 
 from constants import DATABASE_PATH
+import pandas as pd
 
 
 def _connect_to_database():
@@ -142,9 +143,9 @@ def get_cointegrated_markets():
     conn, cursor = None, None
     try:
         conn, cursor = _connect_to_database()
-        cursor.execute("SELECT * FROM cointegrated_pairs")
-        pairs = cursor.fetchall()
+        pairs = pd.read_sql_query("SELECT * FROM cointegrated_pairs", conn)
         return pairs
+
     finally:
         if conn:
             conn.close()
