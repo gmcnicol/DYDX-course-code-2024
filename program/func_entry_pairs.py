@@ -41,19 +41,19 @@ async def open_positions(client):
   for index, row in df.iterrows():
 
     # Extract variables
-    base_market = row["base_market"]
-    quote_market = row["quote_market"]
+    first_market = row["first_market"]
+    second_market = row["second_market"]
     hedge_ratio = row["hedge_ratio"]
     half_life = row["half_life"]
 
     # Continue if ignore asset
-    if base_market in IGNORE_ASSETS or quote_market in IGNORE_ASSETS:
+    if first_market in IGNORE_ASSETS or second_market in IGNORE_ASSETS:
       continue
 
     # Get prices
     try:
-      series_1 = await get_candles_recent(client, base_market)
-      series_2 = await get_candles_recent(client, quote_market)
+      series_1 = await get_candles_recent(client, first_market)
+      series_2 = await get_candles_recent(client, second_market)
     except Exception as e:
       print(e)
       continue
@@ -64,11 +64,12 @@ async def open_positions(client):
       z_score = calculate_zscore(spread).values.tolist()[-1]
 
       # Establish if potential trade
+      # Establish if potential trade
       if abs(z_score) >= ZSCORE_THRESH:
 
         # Ensure like-for-like not already open (diversify trading)
-        is_base_open = await is_open_positions(client, base_market)
-        is_quote_open = await is_open_positions(client, quote_market)
+        is_base_open = await is_open_positions(client, first_market)
+        is_quote_open = await is_open_positions(client, second_market)
 
         # Place trade
         if not is_base_open and not is_quote_open:
@@ -83,8 +84,8 @@ async def open_positions(client):
           accept_base_price = float(base_price) * 1.01 if z_score < 0 else float(base_price) * 0.99
           accept_quote_price = float(quote_price) * 1.01 if z_score > 0 else float(quote_price) * 0.99
           failsafe_base_price = float(base_price) * 0.05 if z_score < 0 else float(base_price) * 1.7
-          base_tick_size = markets["markets"][base_market]["tickSize"]
-          quote_tick_size = markets["markets"][quote_market]["tickSize"]
+          base_tick_size = markets["markets"][first_market]["tickSize"]
+          quote_tick_size = markets["markets"][second_market]["tickSize"]
 
           # Format prices
           accept_base_price = format_number(accept_base_price, base_tick_size)
@@ -94,16 +95,16 @@ async def open_positions(client):
           # Get size
           base_quantity = 1 / base_price * USD_PER_TRADE
           quote_quantity = 1 / quote_price * USD_PER_TRADE
-          base_step_size = markets["markets"][base_market]["stepSize"]
-          quote_step_size = markets["markets"][quote_market]["stepSize"]
+          base_step_size = markets["markets"][first_market]["stepSize"]
+          quote_step_size = markets["markets"][second_market]["stepSize"]
 
           # Format sizes
           base_size = format_number(base_quantity, base_step_size)
           quote_size = format_number(quote_quantity, quote_step_size)
 
           # Ensure size (minimum order size greater than $1 according to V4 documentation)
-          base_min_order_size = 1 / float(markets["markets"][base_market]["oraclePrice"])
-          quote_min_order_size = 1 / float(markets["markets"][quote_market]["oraclePrice"])
+          base_min_order_size = 1 / float(markets["markets"][first_market]["oraclePrice"])
+          quote_min_order_size = 1 / float(markets["markets"][second_market]["oraclePrice"])
 
           # Combine checks
           check_base = float(base_quantity) > base_min_order_size
@@ -124,8 +125,8 @@ async def open_positions(client):
             # Create Bot Agent
             bot_agent = BotAgent(
               client,
-              market_1=base_market,
-              market_2=quote_market,
+              market_1=first_market,
+              market_2=second_market,
               base_side=base_side,
               base_size=base_size,
               base_price=accept_base_price,

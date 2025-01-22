@@ -1,13 +1,13 @@
-# from dydx3.constants import API_HOST_MAINNET, API_HOST_GOERLI
 from decouple import config
 
+IS_TESTING = True
 # I have money in binance...
 EXCHANGE= "binance"
 API_KEY = config(f"{EXCHANGE.upper()}_API_KEY")
 API_SECRET = config(f"{EXCHANGE.upper()}_API_SECRET")
 
 # Close all open positions and orders
-ABORT_ALL_POSITIONS = True
+ABORT_ALL_POSITIONS = False
 
 # Find Cointegrated Pairs
 FIND_COINTEGRATED = True
@@ -37,3 +37,4 @@ CLOSE_AT_ZSCORE_CROSS = True
 QUOTE_CURRENCY = "BTC"
 
 DATABASE_PATH = "db.sqlite"
+MIGRATION_PATH = "migrations"

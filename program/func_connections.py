@@ -1,6 +1,6 @@
 import ccxt.async_support as ccxt
 
-from constants import EXCHANGE, API_KEY, API_SECRET
+from constants import EXCHANGE, API_KEY, API_SECRET, IS_TESTING
 
 
 # Client Class
@@ -18,9 +18,11 @@ async def connect_exchange():
   ccxt_client = getattr(ccxt, EXCHANGE)({
     'apiKey': API_KEY,
     'secret': API_SECRET,
+    'enableRateLimit': True,
   })
   # Determine market data endpoint
   ccxt_client.options["warnOnFetchOpenOrdersWithoutSymbol"] = False
+  ccxt_client.set_sandbox_mode(IS_TESTING)
   return ccxt_client
 
 async def close_client(client):

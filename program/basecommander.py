@@ -25,7 +25,6 @@ def run_migrations(database_path, migrations_dir):
     conn = sqlite3.connect(database_path)
     try:
         current_version = get_user_version(conn)
-        print(f"Current user_version: {current_version}")
 
         migration_files = sorted(
             [f for f in os.listdir(migrations_dir) if f.startswith("m") and f.endswith(".sql")]
@@ -47,7 +46,6 @@ def run_migrations(database_path, migrations_dir):
                     print("Aborting migrations.")
                     break
 
-        print("Migration process complete.")
     finally:
         conn.close()
 

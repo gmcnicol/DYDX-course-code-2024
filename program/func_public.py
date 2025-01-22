@@ -1,6 +1,5 @@
 import time
 from datetime import datetime, timedelta, timezone
-from pprint import pprint
 
 import pandas as pd
 
@@ -56,33 +55,24 @@ async def get_markets(client):
         if ("status" in market_info["info"] and market_info["info"]["status"] == "TRADING") and market_info[
             "type"] == "spot" and market_info["quote"] == QUOTE_CURRENCY:
             spot_markets.append(market)
-    pprint(spot_markets)
     return spot_markets
 
 
-# Construct market prices
-async def construct_market_prices(client):
-    active_markets = await get_markets(client)
-    close_prices = await get_candles_historical(client, active_markets[0])
-    df = pd.DataFrame(close_prices)
+async def get_historical_prices_for_all_markets(exchange):
+    active_markets = await get_markets(exchange)
+    df = pd.DataFrame(await get_candles_historical(exchange, active_markets[0]))
     df.set_index("datetime", inplace=True)
-    for (i, market) in enumerate(active_markets[1:]):
-        print(f"Extracting prices for {i + 1} of {len(active_markets)} tokens for {market}")
-        time.sleep(client.rateLimit / 1000)
-        close_prices_add = await get_candles_historical(client, market)
-        df_add = pd.DataFrame(close_prices_add)
+
+    for i, market in enumerate(active_markets[1:], start=1):
+        time.sleep(exchange.rateLimit / 1000)
+        df_add = pd.DataFrame(await get_candles_historical(exchange, market))
         try:
             df_add.set_index("datetime", inplace=True)
             df = pd.merge(df, df_add, how="outer", on="datetime", copy=False)
-            # print(df.head())
         except Exception as e:
             print(f"Failed to add {market} - {e}")
-        del df_add
 
-    # Check any columns with NaNs
     nans = df.columns[df.isna().any()].tolist()
-    if len(nans) > 0:
-        print("Dropping columns: ")
-        print(nans)
+    if nans:
         df.drop(columns=nans, inplace=True)
     return df

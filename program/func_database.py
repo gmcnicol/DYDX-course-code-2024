@@ -4,6 +4,13 @@ from datetime import datetime, timezone
 from constants import DATABASE_PATH
 
 
+def _connect_to_database():
+    # Connect to the SQLite database
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+    return conn, cursor
+
+
 def open_position(exchange, pair_1, pair_2, open_position_amount):
     """
     Opens a new position in the database based on CCXT pairs.
@@ -73,9 +80,7 @@ def close_position_by_id(db_path, position_id, closed_position_amount):
     """
     conn = None
     try:
-        # Connect to the SQLite database
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+        conn, cursor = _connect_to_database()
 
         # Get current UTC time
         close_timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
@@ -120,5 +125,26 @@ def close_position_by_id(db_path, position_id, closed_position_amount):
 
     finally:
         # Close the database connection
+        if conn:
+            conn.close()
+
+def store_cointegrated_markets(pairs):
+    conn, cursor = None, None
+    try:
+        conn, cursor = _connect_to_database()
+        pairs.to_sql('cointegrated_pairs', conn, if_exists='replace', index=False)
+        conn.commit()
+    finally:
+        if conn:
+            conn.close()
+
+def get_cointegrated_markets()
+    conn, cursor = None, None
+    try:
+        conn, cursor = _connect_to_database()
+        cursor.execute("SELECT * FROM cointegrated_pairs")
+        pairs = cursor.fetchall()
+        return pairs
+    finally:
         if conn:
             conn.close()
